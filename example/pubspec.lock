@@ -107,7 +107,7 @@ packages:
     source: hosted
     version: "1.0.5"
   dio:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dio
       url: "https://pub.flutter-io.cn"
@@ -449,14 +449,14 @@ packages:
     source: hosted
     version: "2.0.15"
   wechat_assets_picker:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: wechat_assets_picker
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "8.3.2"
   wechat_camera_picker:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: wechat_camera_picker
       url: "https://pub.flutter-io.cn"

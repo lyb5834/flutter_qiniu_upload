@@ -2,6 +2,8 @@ class Config {
   String? fixedZone;
   String? recorderPath;
 
+  Config({this.fixedZone, this.recorderPath});
+
   static Config fromMap(Map<String, dynamic> map) {
     Config configBean = Config();
     configBean.fixedZone = map['fixedZone'] as String?;
