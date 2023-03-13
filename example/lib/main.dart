@@ -79,7 +79,7 @@ class _MainPageState extends State<MainPage> {
               child: const Text('选择资源上传'),
             ),
             OutlinedButton(
-              onPressed: () => _cancel = true,
+              onPressed: () => _uploadManager?.cancel(),
               child: const Text('取消上传'),
             ),
           ],
@@ -129,13 +129,6 @@ class _MainPageState extends State<MainPage> {
     UploadController controller = UploadController(
       progressHandler: (key, percent) {
         logger('key = $key | percent = $percent');
-      },
-      cancellationSignal: () {
-        if (_cancel) {
-          _cancel = false;
-          return true;
-        }
-        return false;
       },
     );
 

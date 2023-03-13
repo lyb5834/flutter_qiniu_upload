@@ -1,5 +1,7 @@
 package com.flutter.qiniu.upload.flutter_qiniu_upload;
 
+import static com.qiniu.android.storage.Configuration.RESUME_UPLOAD_VERSION_V1;
+
 import androidx.annotation.NonNull;
 
 import com.qiniu.android.common.FixedZone;
@@ -34,7 +36,7 @@ public class FlutterQiniuUploadPlugin implements FlutterPlugin, MethodCallHandle
   private EventChannel eventChannel;
   private EventChannel.EventSink eventSink;
   private UploadManager mUploadManager;
-  private boolean isCancel;
+  private boolean isCancel = false;
   private final String TAG = "QiNiu";
 
   @Override
@@ -54,7 +56,7 @@ public class FlutterQiniuUploadPlugin implements FlutterPlugin, MethodCallHandle
         String recorderPath = map.containsKey("recorderPath") ? map.get("recorderPath").toString() : "";
         Log.d(TAG,"fixedZone = " + fixedZone + "|" + " recorderPath = " + recorderPath);
         FixedZone zone = null;
-        if (fixedZone.isEmpty()) {
+        if (!fixedZone.isEmpty()) {
            zone = new FixedZone(new String[]{fixedZone});
         }
         FileRecorder recorder = null;
@@ -65,11 +67,12 @@ public class FlutterQiniuUploadPlugin implements FlutterPlugin, MethodCallHandle
         }
 
         Configuration config = new Configuration.Builder()
-                .useHttps(true)
                 .recorder(recorder)
                 .zone(zone)
                 .build();
-        mUploadManager = new UploadManager(config);
+        if (mUploadManager == null) {
+          mUploadManager = new UploadManager(config);
+        }
       }
       result.success(true);
     } else if (call.method.equals("cancel")) {
@@ -85,7 +88,7 @@ public class FlutterQiniuUploadPlugin implements FlutterPlugin, MethodCallHandle
         String token = map.get("token").toString();
         String key = map.get("key").toString();
 
-        Map<String, String> params = null;
+        Map<String, String> params = new HashMap<>();
         String mimeType = null;
         boolean checkCrc = false;
 
@@ -100,32 +103,42 @@ public class FlutterQiniuUploadPlugin implements FlutterPlugin, MethodCallHandle
         }
 
         UploadOptions options = new UploadOptions(params, mimeType, checkCrc, (mKey, percent) -> {
+          Log.d(TAG, "percent = " + percent);
           HashMap<String, Object> eventBack = new HashMap<>();
           HashMap<String, String> dataMap = new HashMap<>();
           dataMap.put("key" , mKey);
           dataMap.put("percent", String.valueOf(percent));
           eventBack.put("type" , "percent");
           eventBack.put("data" , dataMap);
-          eventSink.success(eventBack);
+          if (eventSink != null) {
+            eventSink.success(eventBack);
+          }
         }, () -> {
-          HashMap<String, Object> eventBack = new HashMap<>();
-          eventBack.put("type" , "cancel");
-          eventSink.success(eventBack);
+//          HashMap<String, Object> eventBack = new HashMap<>();
+//          eventBack.put("type" , "cancel");
+//          if (eventSink != null) {
+//            eventSink.success(eventBack);
+//          }
           return isCancel;
         });
 
-        mUploadManager.put(filePath, key, token, (mKey, info, response) -> {
-          if (info.isOK()) {
-            try {
-              String jsonString = response.toString();
-              Log.d(TAG, jsonString);
-            } catch (Exception error) {
-              Log.e(TAG, error.getMessage());
+        if (mUploadManager != null) {
+          mUploadManager.put(filePath, key, token, (mKey, info, response) -> {
+            if (info.isOK()) {
+              try {
+                String jsonString = response.toString();
+                Log.d(TAG, jsonString);
+                result.success(jsonString);
+              } catch (Exception error) {
+                Log.e(TAG, error.getMessage());
+                result.error(String.valueOf(info.statusCode), info.message, info.message);
+              }
+            } else {
+              Log.e(TAG, "七牛上传失败: " + info.error);
+              result.error(String.valueOf(info.statusCode), info.error, info.error);
             }
-          } else {
-            Log.e(TAG, info.error);
-          }
-        }, options);
+          }, options);
+        }
       }
     }
     else {

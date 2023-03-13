@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_qiniu_upload/core/config.dart';
 import 'package:flutter_qiniu_upload/core/upload_controller.dart';
@@ -28,8 +30,8 @@ class UploadManager {
         double percent = double.parse(percentInfo['percent'] ?? 0);
         _controller?.progressHandler?.call(uploadKey ?? '', percent);
       } else if (type == 'cancel') {
-        bool cancelSignal = _controller?.cancellationSignal?.call() ?? false;
-        _methodChannel.invokeMethod('cancel', cancelSignal);
+        // bool cancelSignal = _controller?.cancellationSignal?.call() ?? false;
+        // _methodChannel.invokeMethod('cancel', cancelSignal);
       }
     });
   }
@@ -58,8 +60,12 @@ class UploadManager {
       params['checkCrc'] = controller.checkCrc;
     }
 
-    var object = await _methodChannel.invokeMethod('upload', params);
-    Map<String, dynamic> result = Map.from(object);
+    String jsonString = await _methodChannel.invokeMethod('upload', params);
+    Map<String, dynamic> result = json.decode(jsonString);
     return result;
+  }
+
+  Future<bool> cancel() async {
+    return await _methodChannel.invokeMethod('cancel', true);
   }
 }

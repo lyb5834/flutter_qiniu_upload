@@ -61,15 +61,17 @@ FlutterStreamHandler
           }
           
       } params:params checkCrc:checkCrc cancellationSignal:^BOOL{
-          if (self.eventSink) {
-              self.eventSink(@{@"type" : @"cancel"});
-          }
+//          if (self.eventSink) {
+//              self.eventSink(@{@"type" : @"cancel"});
+//          }
           return self.isCancel;
       }];
       
       [self.uploadManager putFile:filePath key:key token:token complete:^(QNResponseInfo *info, NSString *key, NSDictionary *resp) {
-          if ([resp.allKeys containsObject:@"data"]) {
-              result(resp);
+          if (info.isOK) {
+              NSData *jsonData = [NSJSONSerialization dataWithJSONObject:resp options:NSJSONWritingPrettyPrinted error:nil];
+              NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+              result(jsonString);
           } else {
               result([FlutterError errorWithCode:[NSString stringWithFormat:@"%d",info.statusCode] message:info.message details:info.message]);
           }

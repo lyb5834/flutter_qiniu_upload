@@ -36,12 +36,5 @@ android {
 
 dependencies {
     // 1 直接导入
-//    implementation 'com.qiniu:qiniu-android-sdk:8.4.+'
-
-// 2 如果要修改okhttp依赖的版本，可采用以下方式（强烈建议使用七牛库依赖的okhttp版本）
-    implementation ('com.qiniu:qiniu-android-sdk:8.4.+'){
-        exclude (group: 'com.squareup.okhttp3', module: 'okhttp')
-    }
-    implementation 'com.squareup.okhttp3:okhttp:4.2.2'
-
+    implementation 'com.qiniu:qiniu-android-sdk:8.5.2'
 }

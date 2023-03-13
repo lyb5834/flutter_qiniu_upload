@@ -19,22 +19,20 @@ class HttpBase {
   Dio? _dio;
   final CancelToken _cancelToken = CancelToken();
 
+  final baseUrl = "xxx";
+
   HttpBase._internal() {
     if (_dio == null) {
       // BaseOptions、Options、RequestOptions 都可以配置参数，优先级别依次递增，且可以根据优先级别覆盖参数
       BaseOptions options = BaseOptions(
-          baseUrl: 'https://test-minhang.easttone.com/media-basic-port',
+          baseUrl: baseUrl,
           connectTimeout: 20 * 1000,
           receiveTimeout: 60 * 1000,
           sendTimeout: 60 * 1000,
           headers: {
-            "siteId": '310112',
-            "command": "minhang",
-            "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzd"
-                "WIiOiJjODE1NmM2MTU4Y2Q0MjQ3YTAzMGExNThk"
-                "ZDg1NjZkYzszMTAxMTIiLCJpYXQiOjE2NjIwMjQ0ODAs"
-                "ImV4cCI6MjY5ODgyNDQ4MH0.lQqDM3Mb40KNEvT3_buP4mEHp"
-                "OSGH6tvgNhxYgWExuZl5C0mFxoSTsgG4fl4zZwDtMCJ6ApVNDXtN5BfOEkg0Q",
+            "siteId": 'xxx',
+            "command": "xxx",
+            "token": "xxx",
           });
 
       _dio = Dio(options);
@@ -64,9 +62,8 @@ class HttpBase {
   //一般请求，默认域名
   HttpBase _normal() {
     if (_dio != null) {
-      if (_dio?.options.baseUrl !=
-          'https://mhapi.shmedia.tech/media-basic-port') {
-        _dio?.options.baseUrl = 'https://mhapi.shmedia.tech/media-basic-port';
+      if (_dio?.options.baseUrl != baseUrl) {
+        _dio?.options.baseUrl = baseUrl;
       }
     }
     return this;

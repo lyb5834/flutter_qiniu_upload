@@ -11,14 +11,10 @@ class UploadController {
   /// 上传内容进度处理
   final void Function(String key, double percent)? progressHandler;
 
-  /// 取消上传信号
-  final bool Function()? cancellationSignal;
-
   UploadController({
     this.params,
     this.mimeType,
     this.checkCrc = false,
     this.progressHandler,
-    this.cancellationSignal,
   });
 }
